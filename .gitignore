@@ -1,0 +1,9 @@
+# Entorno virtual
+.venv/
+env/
+__pycache__/
+*.pyc
+
+# Archivos de configuración sensibles
+*.pem
+.env
