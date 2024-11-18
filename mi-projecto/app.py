@@ -3,10 +3,14 @@ from flask_socketio import SocketIO, send
 from werkzeug.security import generate_password_hash, check_password_hash
 import mysql.connector
 import os
+from flask_cors import CORS  # Para habilitar CORS si es necesario
 
 # Configuración de la app
 app = Flask(__name__)
-app.secret_key = 'MCPE1234'  # Cambia esto por algo más seguro
+app.secret_key = os.getenv('SECRET_KEY', 'MCPE1234')  # Cambia esto por algo más seguro en producción
+
+# Habilitar CORS (si es necesario)
+CORS(app)
 
 # Inicializamos Flask-SocketIO
 socketio = SocketIO(app)
