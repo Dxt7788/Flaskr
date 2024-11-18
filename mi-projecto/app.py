@@ -1,28 +1,29 @@
 from flask import Flask, render_template, request, redirect, url_for, flash, session
 from flask_socketio import SocketIO, send
-from flask_cors import CORS  # Importa CORS
 import mysql.connector
 from werkzeug.security import generate_password_hash, check_password_hash
+from dotenv import load_dotenv
+import os
+
+# Cargar variables de entorno
+load_dotenv()
 
 # Configuración de la app
 app = Flask(__name__)
-app.secret_key = 'MCPE1234'  # Cambia esto por algo más seguro
+app.secret_key = os.getenv("MCPE1234")
 
-# Habilitar CORS en la app (con esto permitirás conexiones desde cualquier origen)
-CORS(app)
+# Inicializamos Flask-SocketIO
+socketio = SocketIO(app)
 
 # Conexión a la base de datos MySQL
 def get_db_connection():
     conn = mysql.connector.connect(
-        host='localhost',
-        user='Daniel',
-        password='MCPE1234',  # Cambia esto por tu contraseña
-        database='db'  # Nombre de tu base de datos
+        host=os.getenv("localhost"),
+        user=os.getenv("Daniel"),
+        password=os.getenv("MCPE1234"),
+        database=os.getenv("db")
     )
     return conn
-
-# Inicializamos Flask-SocketIO
-socketio = SocketIO(app)
 
 # Página de inicio (login)
 @app.route('/', methods=['GET', 'POST'])
@@ -81,11 +82,10 @@ def chat():
 # Maneja los mensajes del chat
 @socketio.on('message')
 def handle_message(msg):
-    username = session.get('username', 'Anónimo')  # Obtener el nombre del usuario de la sesión
-    message = {'user': username, 'msg': msg}
-    print(f'{username}: {msg}')
-    send(message, broadcast=True)  # Envía el mensaje junto con el nombre del usuario a todos los clientes conectados
+    username = session.get('username', 'Anonimo')  # Obtenemos el usuario actual
+    full_message = f"{username}: {msg}"  # Incluimos el usuario en el mensaje
+    send(full_message, broadcast=True)  # Envía el mensaje a todos los clientes conectados
 
 # Ejecuta la aplicación con SocketIO
 if __name__ == '__main__':
-    socketio.run(app, debug=True)
+    socketio.run(app, host='0.0.0.0', port=5000)
