@@ -1,29 +1,28 @@
 from flask import Flask, render_template, request, redirect, url_for, flash, session
 from flask_socketio import SocketIO, send
-from werkzeug.security import generate_password_hash, check_password_hash
+from flask_cors import CORS  # Importa CORS
 import mysql.connector
-import os
-from flask_cors import CORS  # Para habilitar CORS si es necesario
+from werkzeug.security import generate_password_hash, check_password_hash
 
 # Configuración de la app
 app = Flask(__name__)
-app.secret_key = os.getenv('SECRET_KEY', 'MCPE1234')  # Cambia esto por algo más seguro en producción
+app.secret_key = 'MCPE1234'  # Cambia esto por algo más seguro
 
-# Habilitar CORS (si es necesario)
+# Habilitar CORS en la app (con esto permitirás conexiones desde cualquier origen)
 CORS(app)
-
-# Inicializamos Flask-SocketIO
-socketio = SocketIO(app)
 
 # Conexión a la base de datos MySQL
 def get_db_connection():
     conn = mysql.connector.connect(
-        host=os.getenv('DB_HOST', 'localhost'),  # Usa variables de entorno para configuraciones de Render
-        user=os.getenv('DB_USER', 'Daniel'),
-        password=os.getenv('DB_PASSWORD', 'MCPE1234'),
-        database=os.getenv('DB_NAME', 'db')
+        host='localhost',
+        user='Daniel',
+        password='MCPE1234',  # Cambia esto por tu contraseña
+        database='db'  # Nombre de tu base de datos
     )
     return conn
+
+# Inicializamos Flask-SocketIO
+socketio = SocketIO(app)
 
 # Página de inicio (login)
 @app.route('/', methods=['GET', 'POST'])
@@ -82,11 +81,11 @@ def chat():
 # Maneja los mensajes del chat
 @socketio.on('message')
 def handle_message(msg):
-    username = session.get('username', 'Anónimo')
-    print(f'Recibido de {username}: {msg}')
-    send(f'{username}: {msg}', broadcast=True)  # Envía el mensaje a todos los clientes conectados
+    username = session.get('username', 'Anónimo')  # Obtener el nombre del usuario de la sesión
+    message = {'user': username, 'msg': msg}
+    print(f'{username}: {msg}')
+    send(message, broadcast=True)  # Envía el mensaje junto con el nombre del usuario a todos los clientes conectados
 
 # Ejecuta la aplicación con SocketIO
 if __name__ == '__main__':
-    port = int(os.environ.get('PORT', 5000))
-    socketio.run(app, host='0.0.0.0', port=port)
+    socketio.run(app, debug=True)
