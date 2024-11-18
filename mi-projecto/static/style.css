@@ -1,0 +1,162 @@
+/* Reseteamos algunos estilos predeterminados */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+/* Estilos generales */
+body {
+    font-family: 'Arial', sans-serif;
+    background-color: #f4f7fc;
+    color: #333;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+/* Estilo del contenedor del chat */
+.chat-container {
+    width: 100%;
+    max-width: 600px; /* Máximo de 600px para pantallas grandes */
+    background-color: #fff;
+    border-radius: 10px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    height: 95vh; /* Se ajusta a la pantalla */
+}
+
+/* Área de mensajes */
+.message-area {
+    flex: 1;
+    padding: 15px;
+    overflow-y: auto;
+    border-bottom: 2px solid #f1f1f1;
+    background-color: #fafafa;
+}
+
+/* Mensaje individual */
+.message {
+    padding: 10px;
+    border-radius: 10px;
+    margin-bottom: 10px;
+    max-width: 80%;
+    clear: both;
+}
+
+/* Estilo de los mensajes enviados por el usuario */
+.message.user {
+    background-color: #007bff;
+    color: white;
+    margin-left: auto;
+    text-align: right;
+}
+
+/* Estilo de los mensajes enviados por otros */
+.message.other {
+    background-color: #f1f1f1;
+    color: #333;
+    margin-right: auto;
+    text-align: left;
+}
+
+/* Formulario de entrada */
+.input-area {
+    display: flex;
+    align-items: center;
+    padding: 10px;
+    background-color: #fff;
+    border-top: 2px solid #f1f1f1;
+}
+
+.input-area input {
+    flex: 1;
+    padding: 10px;
+    font-size: 16px;
+    border: 1px solid #ccc;
+    border-radius: 30px;
+    outline: none;
+}
+
+.input-area input:focus {
+    border-color: #007bff;
+}
+
+/* Botón de enviar */
+.input-area button {
+    padding: 10px 20px;
+    background-color: #007bff;
+    border: none;
+    color: white;
+    border-radius: 50%;
+    cursor: pointer;
+    margin-left: 10px;
+    transition: background-color 0.3s;
+}
+
+.input-area button:hover {
+    background-color: #0056b3;
+}
+
+/* Estilo de la cabecera del chat */
+.chat-header {
+    background-color: #007bff;
+    padding: 10px;
+    color: white;
+    text-align: center;
+    font-size: 18px;
+    font-weight: bold;
+}
+
+/* Estilo del pie de página */
+.chat-footer {
+    background-color: #f1f1f1;
+    padding: 10px;
+    text-align: center;
+    font-size: 14px;
+}
+
+/* Burbujas de usuario y otras */
+.message.user:before {
+    content: "Tú";
+    font-weight: bold;
+    color: #ffffff;
+    margin-right: 10px;
+}
+
+.message.other:before {
+    content: "Usuario";
+    font-weight: bold;
+    margin-right: 10px;
+}
+
+/* Media Query para pantallas pequeñas (móviles) */
+@media screen and (max-width: 600px) {
+    .chat-header {
+        font-size: 16px; /* Cabecera más pequeña en móviles */
+    }
+
+    .message-area {
+        padding: 10px; /* Menos padding en el área de mensajes */
+    }
+
+    .message {
+        max-width: 100%; /* Los mensajes ocupan todo el ancho */
+    }
+
+    .input-area input {
+        font-size: 14px; /* Texto más pequeño en el input */
+        padding: 8px; /* Menos padding en el campo de entrada */
+    }
+
+    .input-area button {
+        padding: 8px 16px; /* Botón más pequeño en móviles */
+    }
+
+    .chat-footer {
+        font-size: 12px; /* Texto más pequeño en el pie de página */
+    }
+}

@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chat</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.5.1/socket.io.min.js"></script>
+</head>
+<body>
+    <div class="chat-container">
+        <div class="chat-header">
+            Chat de {{ username }}
+        </div>
+
+        <div id="messages" class="message-area">
+            <!-- Los mensajes se añadirán aquí dinámicamente -->
+        </div>
+
+        <div class="input-area">
+            <input id="message-input" type="text" placeholder="Escribe tu mensaje...">
+            <button id="send-btn">Enviar</button>
+        </div>
+
+        <div class="chat-footer">
+            <p>Powered by Flask y Socket.io</p>
+        </div>
+    </div>
+
+    <script>
+        var socket = io.connect('https://1671-45-169-251-194.ngrok-free.app');
+        var messageInput = document.getElementById('message-input');
+        var sendBtn = document.getElementById('send-btn');
+        var messages = document.getElementById('messages');
+
+        // Enviar un mensaje al servidor cuando se hace clic en el botón o presiona Enter
+        sendBtn.addEventListener('click', function() {
+            var msg = messageInput.value;
+            if (msg.trim() !== "") {
+                socket.emit('message', msg);
+                messageInput.value = ""; // Limpiar el campo de entrada
+            }
+        });
+
+        messageInput.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                sendBtn.click();
+            }
+        });
+
+        // Recibir y mostrar los mensajes
+        socket.on('message', function(msg) {
+            var msgElement = document.createElement('div');
+            msgElement.classList.add('message');
+            if (msg.user === '{{ username }}') {
+                msgElement.classList.add('user'); // Mensajes del usuario
+            } else {
+                msgElement.classList.add('other'); // Mensajes de otros usuarios
+            }
+            msgElement.innerHTML = `<span class="msg-user">${msg.user}:</span> ${msg.msg}`;
+            messages.appendChild(msgElement);
+            messages.scrollTop = messages.scrollHeight; // Desplazamiento automático al último mensaje
+        });
+    </script>
+</body>
+</html>
