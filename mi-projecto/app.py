@@ -1,16 +1,12 @@
 from flask import Flask, render_template, request, redirect, url_for, flash, session
 from flask_socketio import SocketIO, send
-import mysql.connector
 from werkzeug.security import generate_password_hash, check_password_hash
-from dotenv import load_dotenv
+import mysql.connector
 import os
-
-# Cargar variables de entorno
-load_dotenv()
 
 # Configuración de la app
 app = Flask(__name__)
-app.secret_key = os.getenv("MCPE1234")
+app.secret_key = 'MCPE1234'  # Cambia esto por algo más seguro
 
 # Inicializamos Flask-SocketIO
 socketio = SocketIO(app)
@@ -18,10 +14,10 @@ socketio = SocketIO(app)
 # Conexión a la base de datos MySQL
 def get_db_connection():
     conn = mysql.connector.connect(
-        host=os.getenv("localhost"),
-        user=os.getenv("Daniel"),
-        password=os.getenv("MCPE1234"),
-        database=os.getenv("db")
+        host=os.getenv('DB_HOST', 'localhost'),  # Usa variables de entorno para configuraciones de Render
+        user=os.getenv('DB_USER', 'Daniel'),
+        password=os.getenv('DB_PASSWORD', 'MCPE1234'),
+        database=os.getenv('DB_NAME', 'db')
     )
     return conn
 
@@ -82,10 +78,11 @@ def chat():
 # Maneja los mensajes del chat
 @socketio.on('message')
 def handle_message(msg):
-    username = session.get('username', 'Anonimo')  # Obtenemos el usuario actual
-    full_message = f"{username}: {msg}"  # Incluimos el usuario en el mensaje
-    send(full_message, broadcast=True)  # Envía el mensaje a todos los clientes conectados
+    username = session.get('username', 'Anónimo')
+    print(f'Recibido de {username}: {msg}')
+    send(f'{username}: {msg}', broadcast=True)  # Envía el mensaje a todos los clientes conectados
 
 # Ejecuta la aplicación con SocketIO
 if __name__ == '__main__':
-    socketio.run(app, host='0.0.0.0', port=5000)
+    port = int(os.environ.get('PORT', 5000))
+    socketio.run(app, host='0.0.0.0', port=port)

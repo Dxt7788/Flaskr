@@ -1,65 +1,44 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Chat</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.5.1/socket.io.min.js"></script>
+    <link rel="stylesheet" href="/static/style.css">
 </head>
 <body>
     <div class="chat-container">
         <div class="chat-header">
-            Chat de {{ username }}
+            <h1>Chat en tiempo real</h1>
         </div>
-
-        <div id="messages" class="message-area">
-            <!-- Los mensajes se añadirán aquí dinámicamente -->
-        </div>
-
-        <div class="input-area">
-            <input id="message-input" type="text" placeholder="Escribe tu mensaje...">
-            <button id="send-btn">Enviar</button>
-        </div>
-
-        <div class="chat-footer">
-            <p>Powered by Flask y Socket.io</p>
-        </div>
+        <div class="chat-box" id="chat-box"></div>
+        <form id="chat-form">
+            <input type="text" id="message-input" placeholder="Escribe un mensaje..." autocomplete="off" required>
+            <button type="submit">Enviar</button>
+        </form>
     </div>
 
+    <script src="https://cdn.socket.io/4.5.0/socket.io.min.js"></script>
     <script>
-        var socket = io.connect('https://1671-45-169-251-194.ngrok-free.app');
-        var messageInput = document.getElementById('message-input');
-        var sendBtn = document.getElementById('send-btn');
-        var messages = document.getElementById('messages');
+        const socket = io();
+        const chatBox = document.getElementById('chat-box');
+        const chatForm = document.getElementById('chat-form');
+        const messageInput = document.getElementById('message-input');
 
-        // Enviar un mensaje al servidor cuando se hace clic en el botón o presiona Enter
-        sendBtn.addEventListener('click', function() {
-            var msg = messageInput.value;
-            if (msg.trim() !== "") {
-                socket.emit('message', msg);
-                messageInput.value = ""; // Limpiar el campo de entrada
-            }
+        // Recibe mensajes del servidor
+        socket.on('message', (msg) => {
+            const messageElement = document.createElement('div');
+            messageElement.textContent = msg;
+            chatBox.appendChild(messageElement);
+            chatBox.scrollTop = chatBox.scrollHeight; // Baja automáticamente
         });
 
-        messageInput.addEventListener('keypress', function(e) {
-            if (e.key === 'Enter') {
-                sendBtn.click();
-            }
-        });
-
-        // Recibir y mostrar los mensajes
-        socket.on('message', function(msg) {
-            var msgElement = document.createElement('div');
-            msgElement.classList.add('message');
-            if (msg.user === '{{ username }}') {
-                msgElement.classList.add('user'); // Mensajes del usuario
-            } else {
-                msgElement.classList.add('other'); // Mensajes de otros usuarios
-            }
-            msgElement.innerHTML = `<span class="msg-user">${msg.user}:</span> ${msg.msg}`;
-            messages.appendChild(msgElement);
-            messages.scrollTop = messages.scrollHeight; // Desplazamiento automático al último mensaje
+        // Envía mensajes
+        chatForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const msg = messageInput.value;
+            socket.send(msg);
+            messageInput.value = '';
         });
     </script>
 </body>
